@@ -1,0 +1,291 @@
+#!/usr/bin/env bash
+# ##################################################
+scriptname="myproject"
+#
+synopsis="create projects/gits, upload/download to git"
+#
+# TODO
+# better way of handling intention
+# git download function
+# deploy function
+# ##################################################
+# Main
+
+function main_script() {
+  # main_scripts docstring
+
+  set_permissions
+
+  if [[ "${noargs}" == "true" ]] ; then
+    echo "No arguments given"
+    echo "What do you want to do?
+    i: install tools
+    c: create a new project
+    u: upload project to github
+    g: get project from github
+    d: develop current project
+    p: deploy current project
+    "
+    read -n1 answer
+    case "$answer" in
+      "i") install_tools ;;
+      "c") create_project ;;
+      "u") upload_project ;;
+      "g") get_project ;;
+      "d") develop_project ;;
+      "p") deploy_project ;;
+      *) echo "invalid option: '$1'. Exiting" 1>&2; exit 1 ;;
+    esac
+  else
+    case "true" in
+      "$install") install_tools ;;
+      "$create") create_project ;;
+      "$upload") upload_project ;;
+      "$get") get_project ;;
+      "$develop") develop_project ;;
+      "$deploy") deploy_project ;;
+    esac
+  fi
+
+  set_permissions
+  echo "done without errors! hf"
+}
+
+function set_permissions() {
+  chmod -R 1777 /home/breachr/Projects/
+  chown -R breachr /home/breachr/Projects/
+  chmod -R 1777 /home/breachr/venvs/
+  chown -R breachr /home/breachr/venvs/
+  setxkbmap de
+  service smbd restart
+}
+
+function install_tools() {
+  apt -y --force-yes update && apt -y --force-yes upgrade
+  apt -y --force-yes install python3-venv python3-dev build-essential libssl-dev libffi-dev python3-setuptools
+  apt -y --force-yes install nodejs
+  npm i -g npm@latest
+  npm i -g @vue/cli @vue/cli-service-global
+  npm i -g @quasar/cli
+  apt -y --force-yes autoremove
+}
+
+function create_project() {
+  clear
+  echo "Enter Project Name"
+  read name
+  echo "Enter Description (OPTIONAL)"
+  read descri
+
+  # files
+  echo "Creating Project Files"
+  shopt -s dotglob # this enables cp to include hidden files!!!
+  mkdir -p /home/breachr/Projects/$name/{frontend,backend,design}
+  cp -r ./frontend/quasar_template/* /home/breachr/Projects/$name/frontend
+  cp -r ./design/* /home/breachr/Projects/$name/design
+  cp -r ./backend/templates/basic_flask/* /home/breachr/Projects/$name/backend
+  cp ./README.MD /home/breachr/Projects/$name/
+  cp ./nginx_entry /home/breachr/Projects/$name/
+  cp ./.gitignore /home/breachr/Projects/$name/
+  cp ./myproject /home/breachr/Projects/$name/
+  cd /home/breachr/Projects/$name
+  sed -i "s/XXAPPNAMEXX/${name}/g" ./frontend/package.json
+  sed -i "s/XXDESCRIXX/${descri}/g" ./frontend/package.json
+
+  # create Github Project
+  echo "Creating Github Project"
+  git config --global user.email "breachr@pm.me"
+  git config --global user.name "breachr"
+  curl -u 'breachr' https://api.github.com/user/repos -d '{"name":"'$name'"}'
+  git init
+  git remote add origin https://github.com/breachr/$name.git
+  git add .
+  git commit -m "first commit"
+  git push -u origin master
+
+  # Install modules
+  cd ./frontend
+  # npm install         # do this manually! without sudo
+  #npm audit fix
+  cd ..
+
+  # Create Project VENV
+  echo "Creating Project VENV"
+  python3 -m venv /home/breachr/venvs/$name/
+  source /home/breachr/venvs/$name/bin/activate
+  pip install -r /home/breachr/Projects/$name/backend/requirements.txt
+
+  # Set permissions
+  set_permissions
+
+  # Go to dir and start developing
+  xdotool type "cd /home/breachr/Projects/$name/";xdotool key KP_Enter
+  develop_project
+}
+
+function upload_project() {
+  clear
+  echo "uploading changes to repository"
+  # You need to run git config as sudo once !!!
+  git add .
+  git commit -m "commit"
+  git push -u origin master
+}
+
+function get_project() {
+  clear
+  echo "downloading current version"
+  git fetch --all
+  git pull origin master
+}
+
+function develop_project() {
+  echo "starting backend"
+  # Backend
+  xdotool keydown alt key e; sleep 0.5; xdotool keyup alt
+  xdotool type 'cd backend/';xdotool key KP_Enter
+  xdotool type 'source /home/breachr/venvs/'$(pwd | cut -d"/" -f5)'/bin/activate';xdotool key KP_Enter
+  xdotool type 'python server.py';xdotool key KP_Enter
+  echo "starting frontend"
+  # Frontend
+  xdotool keydown alt key q; sleep 0.5; xdotool keyup alt
+  xdotool type 'cd frontend/';xdotool key KP_Enter
+  xdotool type 'quasar dev';xdotool key KP_Enter
+}
+
+function deploy_project() {
+  echo "currently only 'deploys' to the flask backend"
+  clear
+  echo "Building Frontend"
+  cd frontend/
+  quasar build
+  cd ..
+  echo "Done Building, copying files"
+  cp -r frontend/dist/spa/* backend/static/
+
+  # clear
+  # echo "1: Build App"
+  # echo "2: Test App in pywebview"
+  # echo "3: Deploy to executable"
+  # read answer
+
+  # case "$answer" in
+  # ################################ Build
+  # 1)
+  #   echo "Building App"
+  #   cd frontend/
+  #   quasar build
+  #   rm -r ../backend/static/*
+  #   cp -r dist/spa-mat/* ../backend/static
+  #   echo "done"
+  # ;;
+  # ################################ Pywebview
+  # 2)
+  #   echo "Testing in pywebview!"
+  #   xhost si:localuser:breachr
+  #   xdotool keydown alt key e; sleep 0.5; xdotool keyup alt
+  #   xdotool type 'cd backend; su breachr';xdotool key KP_Enter
+  #   xdotool type 'source /home/breachr/venvs/'$(pwd | cut -d"/" -f4)'/bin/activate';xdotool key KP_Enter
+  #   xdotool type 'python main.py';xdotool key KP_Enter
+  #   echo "done"
+  # ;;
+  # ################################ Create Exe
+  # 3)
+  #   echo "TODO"
+  #   echo "https://github.com/r0x0r/pywebview/issues/346"
+  #   echo "good job"
+  # ;;
+  # esac
+}
+
+# ##################################################
+# Arg Parser
+
+install=false
+create=false
+upload=false
+download=false
+develop=false
+deploy=false
+
+logging=false
+args=()
+
+usage() {
+  echo -n "`basename "$0"` [OPTION]... [FILE]...
+  $synopsis
+
+  -i, --install     install tools (run atleast once!)
+  -c, --create      create a new project (quasar/flask)
+  -u, --upload      upload project to github
+  -g, --get         get github version
+  -d, --develop     develop current project
+  -p, --deploy      deploy current project
+  -l, --log         Log stdout and stderr (pipes stay active)
+  -h, --help        Display this help and exit
+      --version     Output version information and exit
+  "
+}
+
+if [[ "$#" -eq 0 ]] ; then
+  noargs=true
+else
+  noargs=false
+fi
+# [[ $# -eq 0 ]] && set -- "--help" # Uncomment to force arguments when invoking the script
+while [[ $1 = -?* ]]; do
+  case $1 in
+    -i|--install) install=true ;;
+    -c|--create) create=true ;;
+    -u|--upload) upload=true ;;
+    -g|--get) get=true ;;
+    -d|--develop) develop=true ;;
+    -p|--deploy) deploy=true ;;
+    -l|--log) logging=true ;;
+    -h|--help) usage >&2; exit ;;
+    --version) echo "$(basename $0) ${version}"; exit ;;
+    --endopts) shift; break ;;
+    *) echo "invalid option: '$1'. Exiting" 1>&2; exit 1 ;;
+  esac
+  shift
+done
+args+=("$@") # Store the remaining part as arguments.
+
+# ##################################################
+# Exit Management
+
+function die() { echo "$*" 1>&2 ; exit 1; } # remember ; on 1-liners
+function trapCleanup() {
+  echo ""
+  if [[ -d "./tmp_dir" ]]; then
+    rm -r "./tmp_dir"
+  fi
+  die "ERROR: Exiting trapped."
+}
+function safeExit() {
+  if [[ -d "$./tmp_dir" ]]; then
+    rm -r "./tmp_dir"
+  fi
+  trap - INT TERM EXIT
+  exit
+}
+
+# ##################################################
+# Log & Startup
+set -o pipefail # Always return highest exitcode
+set -o errexit  # Exit on any error
+# set -o xtrace   # aka set -x show executed cmd
+# export DEBIAN_FRONTEND=noninteractive
+
+if [[ "${logging}" == "true" ]] ; then
+  echo "logging output and error";
+  main_script > >(tee -a "$scriptname".log) 2> >(tee -a "$scriptname".error | tee -a "$scriptname".log >&2)
+  # echo "logging error only";
+  # main_script 2> >(tee -a "$scriptname".error | tee -a "$scriptname".log >&2)
+else
+  main_script
+fi
+
+echo "Exitcode: $?" # echoes exit code of main script
+trap trapCleanup EXIT INT TERM # cleanup
+safeExit

@@ -1,0 +1,168 @@
+// Your own variables (that are declared here) and Quasar's own
+// ones will be available out of the box in your .vue/.scss/.sass files
+
+// Tip: Use the "Theme Builder" on Quasar's documentation website.
+
+// App Shared Color Variables
+// --------------------------------------------------
+// It's highly recommended to change the default colors
+// to match your app's branding.
+
+$primary   : #3C4858
+$secondary : #99cc33
+$tertiary  : #FFCA2D
+
+$neutral   : #E0E1E2
+$positive  : #21BA45
+$negative  : #DB2828
+$info      : #31CCEC
+$warning   : #F2C037
+
+html
+  background-color: $primary
+// positions -----------------------------------------------
+.mycenter // requires set width !
+  position: relative
+  margin-left: auto
+  margin-right: auto
+
+// Animations ----------------------------------------------
+.fade-enter // Fading
+  // this will be active only for one second
+  opacity: 0
+.fade-enter-active
+  transition: opacity 1s
+.fade-leave
+  // opacity: 1; not neccessary its the default anyway
+.fade-leave-active
+  transition: opacity 1s
+  opacity: 0; // needed because its not default
+
+.hoverizer // Hoverizer
+  transition: all 0.2s linear
+.hoverizer:hover
+  box-shadow: 0px 10px 41px 4px rgba(0, 0, 0, 0.24)
+  transform: translateY(-4px)
+
+.hoverizerColored // Hoverizer Colored
+  transition: all 0.4s linear !important
+.hoverizerColored:hover
+  background-color: $secondary !important
+  box-shadow: 0px 10px 41px 4px rgba(0, 0, 0, 0.24) !important
+  transform: translateY(-4px)
+.hoverizerColored:hover > *
+  color: white !important
+
+.mylink // Links
+  transition: color 0.4s
+  cursor: pointer
+.mylink:hover
+  color: $secondary
+
+// container BGS / fill is for sepas -----------------------
+.bg0
+  background-color: #ffffff
+  fill: #ffffff
+.bg1
+  background-color: #F5F3F4
+  fill: #F5F3F4
+.bg2
+  background-color: #E4E4E4
+  fill: #E4E4E4
+.bg3
+  background-color: #D3D3D3
+  fill: #D3D3D3
+.bg4
+  background-color: #B6B6B6
+  fill: #B6B6B6
+.bg5
+  background-color: #3C4858
+  fill: #3C4858
+.bg6
+  background-color: #444444
+  fill: #444444
+.bg7
+  background-color: #343434
+  background-size: 200% 240%
+  background: #232323
+  background: radial-gradient(ellipse at center,#585858 0,#232323 100%)
+  background-size: 550% 450%
+
+// Typography (only robo and robo slab!) -------------------
+.lighted
+  color: #999
+.darkened
+  color: #212529
+.black
+  color: black
+.white
+  color: white
+.uppa
+  text-transform: uppercase
+.noSlab
+  font-family: 'Roboto', serif
+.withUnder
+  margin-bottom: 0px
+.imUnder
+  margin-top: 0px
+  color: #999
+  margin-bottom: 2em
+.centered
+  text-align: center
+/////////////////////////
+// @import url('https://fonts.googleapis.com/css?family=Roboto+Slab')
+@import url('https://fonts.googleapis.com/css?family=Raleway')
+// @import url('https://fonts.googleapis.com/css?family=Fjalla+One')
+// @import url('https://fonts.googleapis.com/css?family=Lato')
+// @import url('https://fonts.googleapis.com/css?family=Oswald')
+// @import url('https://fonts.googleapis.com/css?family=Montserrat')
+// Set the default font-family
+$typography-font-family : 'Roboto' !default
+
+// Fix font-weight values to match the imported font family weights
+// $text-weights: (thin: 300, light: 400, regular: 600, medium: 700, bold: 800, bolder: 800) !default
+// $button-font-weight: 600 // or 400 if you prefer thinner
+
+a,p,h1,h2,h3,h4,h5,h6
+  color: #3C4858
+  margin-bottom: 0.7rem
+  // letter-spacing: 1px
+  font-weight: 400
+  line-height: 1.2
+a
+  text-decoration: none
+  color: unset
+  font-weight: bold
+i
+  color: white
+
+p
+  font-weight: 300
+  font-size: 1.0625rem;line-height: 1.55em
+h1
+  font-weight: bold !important
+  line-height: 1.15em !important
+h2
+  font-weight: 600 !important
+  line-height: 1.5em !important
+h3
+  font-weight: 400 !important
+  line-height: 1.4em !important
+h4
+  font-weight: 300 !important
+  line-height: 1.15em !important
+h5
+  font-weight: 300 !important
+  font-size: 1.0625rem !important
+  line-height: 1.55em !important
+h6
+  font-weight: bold !important
+  font-size: 0.75rem !important
+  line-height: 1.5em !important
+  text-transform: uppercase !important
+
+@-ms-viewport
+  width: device-width
+
+*,*::before,*::after
+  box-sizing:border-box
