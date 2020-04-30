@@ -143,14 +143,14 @@ function develop_project() {
   echo "starting backend"
   # Backend
   xdotool keydown alt key e; sleep 0.5; xdotool keyup alt
-  xdotool type 'cd backend/';xdotool key KP_Enter
-  xdotool type 'source /home/breachr/venvs/'$(pwd | cut -d"/" -f5)'/bin/activate';xdotool key KP_Enter
-  xdotool type 'python server.py';xdotool key KP_Enter
+  xdotool type 'cd frontend/';xdotool key KP_Enter
+  xdotool type 'quasar dev';xdotool key KP_Enter
   echo "starting frontend"
   # Frontend
   xdotool keydown alt key q; sleep 0.5; xdotool keyup alt
-  xdotool type 'cd frontend/';xdotool key KP_Enter
-  xdotool type 'quasar dev';xdotool key KP_Enter
+  xdotool type 'cd backend/';xdotool key KP_Enter
+  xdotool type 'source /home/breachr/venvs/'$(pwd | cut -d"/" -f5)'/bin/activate';xdotool key KP_Enter
+  xdotool type 'python run_app.py';xdotool key KP_Enter
 }
 
 function deploy_project() {

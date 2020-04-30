@@ -8,8 +8,8 @@
       <div class="bigLogoWrapper">
         <transition name="fadeMove">
           <div v-if="bigLogo" class="bigLogo">
-            <h2>KFZ Meisterbetrieb</h2>
-            <h2>Rolf Albrink</h2>
+            <h2>Playground</h2>
+            <h2>breachr</h2>
             <img src="../../../statics/logo/mym_logo.svg" alt="">
             <q-btn id="home" @click="openURL('tel:+495222-21069')" color="secondary" icon="phone" label="MO-FR 8-17 Uhr" />
             <div class="downfador"></div>
@@ -20,7 +20,7 @@
       <div class="smallLogoWrapper">
         <transition name="fadeReverse">
           <div v-if="smallLogo" class="smallLogo">
-            <h2 id="home">KFZ-Albrink</h2>
+            <h2 id="home">PLAYGROUND!</h2>
           </div>
         </transition>
       </div>
